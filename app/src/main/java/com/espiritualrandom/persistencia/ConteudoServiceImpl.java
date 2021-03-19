@@ -28,13 +28,6 @@ import static com.espiritualrandom.util.ServiceConstants.TAREFA;
 
 public class ConteudoServiceImpl extends FireBaseUtil implements ConteudoService {
 
-
-    protected DatabaseReference database;
-
-    protected void getReferenceDataBase() {
-        this.database = FirebaseDatabase.getInstance().getReference();
-    }
-
     @Override
     public List<Conteudo> retornaListaConteudo() {
         List<Conteudo> conteudos = new ArrayList<>();
@@ -64,17 +57,13 @@ public class ConteudoServiceImpl extends FireBaseUtil implements ConteudoService
     @Override
     public Conteudo retornaConteudoAtual() {
         getReferenceDataBase();
-
         Task<DataSnapshot> dataSnapshotTask = this.database.child(CONTEUDO_ATUAL).getRoot().get();
-
 
         try {
             Thread.currentThread().sleep(1200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
         DataSnapshot dataSnapshot = dataSnapshotTask.getResult().child(CONTEUDO_ATUAL);
 
         Conteudo conteudo = new Conteudo(dataSnapshot.child(MENSAGEM).getValue().toString(),
@@ -95,16 +84,16 @@ public class ConteudoServiceImpl extends FireBaseUtil implements ConteudoService
 
     @Override
     public List<Conteudo> retornaNovaListaDeConteudos(List<Conteudo> conteudosCarregados, Conteudo conteudoRecuperado) {
-        List<Conteudo> conteudosTemporario = new ArrayList<>();
+        List<Conteudo> novaLista = new ArrayList<>();
         for (Conteudo conteudo : conteudosCarregados) {
             if (mensagemRecuperadaDiferenteDasMensagensDaLista(conteudoRecuperado, conteudo)
                     && tarefaRecuperadaDiferenteDasTarefasDaLista(conteudoRecuperado, conteudo)
                     && penitenciaRecuperadaDiferenteDasPenitenciasDaLista(conteudoRecuperado, conteudo))
             {
-                conteudosTemporario.add(conteudo);
+                novaLista.add(conteudo);
             }
         }
-        return conteudosTemporario;
+        return novaLista;
     }
 
     private boolean mensagemRecuperadaDiferenteDasMensagensDaLista(Conteudo conteudoRecuperado, Conteudo conteudo) {
